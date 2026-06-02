@@ -33,7 +33,7 @@ struct CareElderlyApp: App {
                 .environmentObject(vitalViewModel)
 
                 // ── Wire VitalSignViewModel → AppState ────────────────────
-                // Forward WebSocket connection status to AppState so the
+                // Forward MQTT connection status to AppState so the
                 // banner in DashboardView and SettingsView updates correctly.
                 .onReceive(
                     vitalViewModel.mqttService.$connectionStatus

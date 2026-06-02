@@ -120,7 +120,6 @@ Valid `event_type` values: `cardiac_arrest`, `respiratory_arrest`, `fall`, `hear
 |----------|----------|------|
 | `guardian1` | `1234` | Guardian |
 | `elder1` | `1234` | Monitored |
-| `zachary` | `zachary` | Guardian |
 
 ---
 

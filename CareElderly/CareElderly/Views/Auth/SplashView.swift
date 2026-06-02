@@ -53,7 +53,7 @@ struct SplashView: View {
                 .scaleEffect(logoScale).opacity(logoOpacity)
 
                 VStack(spacing: 8) {
-                    Text("CareElerly")
+                    Text("CareElderly")
                         .font(.system(size: 30, weight: .bold, design: .rounded))
                         .foregroundColor(.white)
                     Text("AI-Powered Vital Sign Monitor")
