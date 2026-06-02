@@ -60,6 +60,8 @@ Anomaly score = min(MSE / 0.003995, 1.0)   # 95th-percentile threshold on test s
 | Final val loss (MSE) | 0.001333 |
 | 95th-percentile threshold | 0.003995 |
 
+> **Note on metrics:** The near-perfect ROC AUC reflects the model's ability to separate normal windows from *synthetically generated* anomalies (spike injection, Gaussian noise, sudden step shifts). Real-world clinical anomalies are more subtle and varied; evaluation against a labelled clinical dataset is listed as future work.
+
 ![Training results](LSTM_AutoDetector/plots/training_results.png)
 
 ### Dataset
@@ -144,6 +146,20 @@ Valid `event_type` values: `cardiac_arrest`, `respiratory_arrest`, `fall`, `hear
 
 ---
 
+## Future Work
+
+- **Real clinical dataset:** The current model is trained on BIDMC (normal physiological data) and evaluated against synthetic anomalies. Replacing or augmenting with a labelled clinical dataset containing genuine cardiac and respiratory events would substantially improve real-world reliability and yield more meaningful evaluation metrics.
+
+- **Model improvements:** The bidirectional LSTM Autoencoder architecture could be extended with a Transformer-based encoder, attention mechanisms, or a variational autoencoder (VAE) formulation to better capture complex temporal dependencies and produce calibrated anomaly scores.
+
+- **Multi-modal input:** Incorporating additional sensor channels (SpO₂, ECG, accelerometer for fall detection) would enable a more comprehensive anomaly model and reduce reliance on rule-based thresholds for non-cardiac events.
+
+- **Personalised fine-tuning:** On-device continual learning could adapt the model's reconstruction baseline to an individual's long-term vital sign patterns, reducing false positives for users whose resting HR or BR naturally falls outside population norms.
+
+- **Backend integration:** A cloud MQTT broker with persistent message queuing and a web dashboard for caregivers would complete the end-to-end system beyond the current iOS-only prototype.
+
+---
+
 ## Author
 
-Zackary Zikai Nie (聂子开) — Xidian University, School of AI, Class of 2026
+Zackary Zikai Nie (聂子开) — Xidian University, School of Artificial Intelligence, Class of 2026
