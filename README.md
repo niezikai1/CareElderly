@@ -92,10 +92,10 @@ python export.py
 
 ## iOS Setup
 
-**Requirements:** Xcode 15+, iOS 16+ deployment target
+**Requirements:** Xcode 26+, iOS 26.0+ deployment target
 
 ```bash
-open Healthcare.mmWave.iOS/Healthcare.mmWave.iOS.xcodeproj
+open CareElderly/CareElderly.xcodeproj
 # Run on simulator or device (Cmd+R)
 ```
 
@@ -127,8 +127,8 @@ Valid `event_type` values: `cardiac_arrest`, `respiratory_arrest`, `fall`, `hear
 ## Project Structure
 
 ```
-├── Healthcare.mmWave.iOS/          iOS Xcode project
-│   └── Healthcare.mmWave.iOS/
+├── CareElderly/                    iOS Xcode project
+│   └── CareElderly/
 │       ├── Models/                 VitalSignData, AlertEvent, User, CoreDataModels
 │       ├── Services/               MQTTService, AuthService, PersistenceController, HealthAnalyticsService
 │       ├── ViewModels/             AppState, VitalSignViewModel, AuthViewModel, HistoryViewModel
