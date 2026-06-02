@@ -77,7 +77,7 @@ class AuthViewModel: ObservableObject {
         clearSession()
     }
 
-    // MARK: - Session persistence (UserDefaults; production: use Keychain)
+    // MARK: - Session persistence
     private func saveSession(user: User) {
         if let data = try? JSONEncoder().encode(user) {
             UserDefaults.standard.set(data, forKey: "session_currentUser")

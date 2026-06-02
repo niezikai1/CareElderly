@@ -209,7 +209,7 @@ class AppState: ObservableObject {
     }
 }
 
-// MARK: - Connection Status Enum (finalized in Step 6)
+// MARK: - Connection Status
 enum ConnectionStatus {
     case connected(serverURL: String)
     case connecting

@@ -114,7 +114,7 @@ Configure the broker address in **Settings → Server Configuration**.
 { "type": "alert", "event_type": "fall", "heart_rate_bpm": 60, "respiratory_rate_rpm": 14 }
 ```
 
-Valid `event_type` values: `cardiac_arrest`, `respiratory_arrest`, `fall`, `heart_rate_high`, `heart_rate_low`, `breathing_abnormal`, `ml_anomaly`
+Valid `event_type` values: `heart_stop`, `breath_stop`, `fall`, `heart_rate_high`, `heart_rate_low`, `breath_rate_abnormal`, `ml_anomaly`
 
 ### Demo Accounts
 

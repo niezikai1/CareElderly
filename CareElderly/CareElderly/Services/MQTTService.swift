@@ -283,7 +283,6 @@ class MQTTService: ObservableObject {
     // MARK: - Message processing
 
     private func processMessage(_ json: String) {
-        print("📨 MQTT message: \(json)")
         guard let raw = json.data(using: .utf8),
               let msg = try? JSONDecoder().decode(ServerMessage.self, from: raw)
         else {

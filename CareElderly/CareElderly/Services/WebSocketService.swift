@@ -11,11 +11,11 @@ import Combine
 struct ServerMessage: Codable {
     let type: String?             // nil for vital-sign packets; "alert" for alert events
 
-    // vital_sign fields — new naming from backend
+    // vital-sign fields
     let heartRate: Double?        // bpm  (key: "heart_rate_bpm")
     let breathingRate: Double?    // rpm  (key: "respiratory_rate_rpm")
     let bodyTemperature: Double?  // °C   (key: "body_temperature_celsius")
-    let timestampMs: Double?      // Unix epoch milliseconds (qkey: "timestamp_ms")
+    let timestampMs: Double?      // Unix epoch milliseconds (key: "timestamp_ms")
 
     // alert fields
     let eventType: String?        // AlertType raw value (e.g. "fall")
