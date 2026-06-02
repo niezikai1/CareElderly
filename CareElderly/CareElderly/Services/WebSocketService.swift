@@ -7,7 +7,7 @@ import Foundation
 import Combine
 
 // MARK: - Incoming JSON message envelope
-/// Decodes both the new radar format (no "type") and the legacy alert format.
+/// Decodes both vital-sign packets (no "type" field) and alert event packets.
 struct ServerMessage: Codable {
     let type: String?             // nil for vital-sign packets; "alert" for alert events
 

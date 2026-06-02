@@ -284,10 +284,9 @@ final class HealthAnalyticsService: @unchecked Sendable {
     ///   BR:  [12,  20] rpm  → [0, 1]
     /// Values are clamped to [0, 1] so out-of-range readings don't corrupt the tensor.
     ///
-    /// Score mapping:  score = min(MSE / 0.00950, 1.0)  — threshold_test.json 95th-percentile (test set)
+    /// Score mapping:  score = min(MSE / 0.004205, 1.0)  — threshold_test.json 95th-percentile (test set)
     private nonisolated func mlReconstructionScore(from samples: [VitalSignData]) -> Double? {
         guard samples.count == 30, let model = anomalyModel else {
-            print("⚠️ ML: model=\(anomalyModel == nil ? "nil" : "ok"), samples=\(samples.count)")
             return nil
         }
 
@@ -306,14 +305,9 @@ final class HealthAnalyticsService: @unchecked Sendable {
             return nil
         }
 
-        print("🧠 ML output features: \(output.featureNames)")
-
         guard let recon = output.featureValue(for: "reconstruction")?.multiArrayValue else {
-            print("⚠️ ML: 'reconstruction' not found — check output name above")
             return nil
         }
-
-        print("🧠 ML recon shape: \(recon.shape)  input[0,0]: hr=\(input[[0,0,0]]) br=\(input[[0,0,1]])  recon[0,0]: \(recon[0]) \(recon[1])")
 
         var mse = 0.0
         for i in 0..<30 {
@@ -325,8 +319,6 @@ final class HealthAnalyticsService: @unchecked Sendable {
         }
         mse /= 60.0
         // 0.004205 = 95th-percentile test-set reconstruction error (threshold_test.json)
-        print("🧠 ML MSE=\(String(format: "%.5f", mse))  score=\(String(format: "%.3f", min(mse/0.004205, 1.0)))")
-
         return min(mse / 0.004205, 1.0)
     }
 
