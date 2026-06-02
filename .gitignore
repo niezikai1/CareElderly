@@ -1,0 +1,55 @@
+# ── Xcode ────────────────────────────────────────────────────────────
+DerivedData/
+*.xcuserstate
+*.xcuserdatad/
+xcshareddata/xcschemes/
+*.moved-aside
+*.xccheckout
+*.hmap
+*.ipa
+*.dSYM.zip
+*.dSYM
+
+# ── Python ───────────────────────────────────────────────────────────
+__pycache__/
+*.pyc
+*.pyo
+*.pth
+.venv/
+venv/
+*.egg-info/
+
+# ── Large dataset & generated files ──────────────────────────────────
+LSTM_AutoDetector/LSTM_AutoEncoder/bidmc-ppg-and-respiration-dataset-1.0.0/
+LSTM_AutoDetector/data.npy
+
+# ── Graduation archive documents (not part of the codebase) ──────────
+Code/
+End/
+Blind_Review/
+Midterm/
+Review_Again/
+Weekly_Report/
+Startup/
+毕业设计表格—全套/
+*.docx
+*.doc
+*.pdf
+*.pptx
+*.ppt
+*.zip
+
+# ── macOS ─────────────────────────────────────────────────────────────
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+
+# ── Project root extras ───────────────────────────────────────────────
+CLAUDE.md
+test_mqtt_smooth.py
+.claude/
+
+# ── Misc ──────────────────────────────────────────────────────────────
+*.log
+.vscode/
