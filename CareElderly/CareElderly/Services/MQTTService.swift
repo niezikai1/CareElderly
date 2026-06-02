@@ -13,7 +13,7 @@ import Combine
 
 class MQTTService: ObservableObject {
 
-    // MARK: Published state — same interface as the legacy WebSocketService
+    // MARK: Published state
     @Published var connectionStatus:  ConnectionStatus = .disconnected
     @Published var lastVitalSign:     VitalSignData?
     @Published var pendingAlertEvent: AlertEvent?

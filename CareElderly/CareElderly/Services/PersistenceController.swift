@@ -36,7 +36,7 @@ final class PersistenceController {
     // MARK: - Init
     init(inMemory: Bool = false) {
         container = NSPersistentContainer(
-            name: "HealthcareStore",
+            name: "CareElderlyStore",
             managedObjectModel: PersistenceController.buildManagedObjectModel()
         )
 
