@@ -284,7 +284,7 @@ final class HealthAnalyticsService: @unchecked Sendable {
     ///   BR:  [12,  20] rpm  → [0, 1]
     /// Values are clamped to [0, 1] so out-of-range readings don't corrupt the tensor.
     ///
-    /// Score mapping:  score = min(MSE / 0.004205, 1.0)  — threshold_test.json 95th-percentile (test set)
+    /// Score mapping:  score = min(MSE / 0.003995, 1.0)  — threshold_test.json 95th-percentile (test set)
     private nonisolated func mlReconstructionScore(from samples: [VitalSignData]) -> Double? {
         guard samples.count == 30, let model = anomalyModel else {
             return nil
@@ -318,8 +318,8 @@ final class HealthAnalyticsService: @unchecked Sendable {
             }
         }
         mse /= 60.0
-        // 0.004205 = 95th-percentile test-set reconstruction error (threshold_test.json)
-        return min(mse / 0.004205, 1.0)
+        // 0.003995 = 95th-percentile test-set reconstruction error (threshold_test.json)
+        return min(mse / 0.003995, 1.0)
     }
 
     // MARK: Private helpers
