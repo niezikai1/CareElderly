@@ -7,13 +7,8 @@ extension Color {
     /// Initialize a Color from a hex string (RGB 6-digit or ARGB 8-digit)
     init(hex: String) {
         let hex = hex.trimmingCharacters(in: CharacterSet.alphanumerics.inverted)
-        // Remove the possible '#' symbol, keep only numbers and letters
-        
         var int: UInt64 = 0
         Scanner(string: hex).scanHexInt64(&int)
-        // Use Scanner to convert the hexadecimal string into an integer
-        // For example: "1976D2" → 1668818 (decimal)
-        
         let a, r, g, b: UInt64
         switch hex.count {
         case 3: (a, r, g, b) = (255, (int >> 8) * 17, (int >> 4 & 0xF) * 17, (int & 0xF) * 17)

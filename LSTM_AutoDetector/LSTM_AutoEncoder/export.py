@@ -5,7 +5,7 @@ import coremltools as ct
 from pathlib import Path
 
 BASE_DIR    = Path(__file__).parent
-HIDDEN_SIZE = 32   # per-direction; bidirectional encoder outputs HIDDEN_SIZE*2 = 32
+HIDDEN_SIZE = 32   # per-direction; bidirectional encoder outputs HIDDEN_SIZE*2 = 64
 SEQ_LEN     = 30
 NUM_LAYERS = 2
 
@@ -19,7 +19,6 @@ class Encoder(nn.Module):
         _, (h, _) = self.lstm(x)
         h_forward = h[-2]
         h_backward = h[-1]
-        
         return torch.cat((h_forward, h_backward), dim=1)
 
 
