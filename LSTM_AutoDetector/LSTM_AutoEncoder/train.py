@@ -1,3 +1,5 @@
+import argparse
+import sys
 import torch
 import torch.nn as nn
 import numpy as np
@@ -254,7 +256,27 @@ def _compute_roc_pr(normal_errors, anomaly_errors):
 
 
 # ── Main ─────────────────────────────────────────────────────────────────
-data  = np.load(BASE_DIR.parent / 'data.npy')
+parser = argparse.ArgumentParser(
+    description='Train LSTM Autoencoder for vital sign anomaly detection.')
+parser.add_argument('--sample', action='store_true',
+                    help='Quick verification run: 5 epochs on a 200-window subset.')
+parser.add_argument('--epochs', type=int, default=300,
+                    help='Number of training epochs (default: 300).')
+args = parser.parse_args()
+
+DATA_PATH = BASE_DIR.parent / 'data.npy'
+if not DATA_PATH.exists():
+    print(f'data.npy not found at {DATA_PATH}.')
+    print('Run preprocess.py first with the BIDMC dataset, or use --sample '
+          'to generate synthetic sample data for quick verification.')
+    sys.exit(1)
+
+data  = np.load(DATA_PATH)
+if args.sample:
+    data = data[:200]
+    args.epochs = 5
+    print(f'--sample mode: using {len(data)} windows, {args.epochs} epochs')
+
 split = int(0.8 * len(data))
 train_tensor = torch.tensor(data[:split], dtype=torch.float32)
 test_tensor  = torch.tensor(data[split:],  dtype=torch.float32)
@@ -267,7 +289,8 @@ device = torch.device(
 print(f'Device: {device}')
 
 model = AutoEncoder().to(device)
-train_losses, val_losses = train(model, train_tensor, test_tensor, device)
+train_losses, val_losses = train(model, train_tensor, test_tensor, device,
+                                 epochs=args.epochs)
 
 model.load_state_dict(torch.load(SAVE_PATH, weights_only=True, map_location=device))
 model.eval()

@@ -5,10 +5,7 @@
 // Primary anomaly path: CoreML LSTM Autoencoder trained on BIDMC dataset.
 // Fallback: z-score against personal baseline when model is unavailable.
 //
-// Reference methodology:
-//   Task Force of ESC/NASPE (1996). "Heart Rate Variability — Standards of
-//   Measurement, Physiological Interpretation, and Clinical Use."
-//   Circulation, 93(5), 1043–1065.
+// RMSSD/SDNN formulae applied to RR approximated from 1 Hz HR (RR ≈ 60000/HR); an HR-variability proxy, not standard HRV.
 
 import Foundation
 import CoreML
@@ -22,7 +19,7 @@ import CoreML
 /// then apply standard time-domain formulae to the resulting RR series.
 struct HRVMetrics {
     /// Root Mean Square of Successive Differences (ms).
-    /// Primary index of parasympathetic (vagal) activity; higher is healthier.
+    /// Primary index of parasympathetic (vagal) activity.
     let rmssd: Double?
 
     /// Standard Deviation of RR intervals (ms).

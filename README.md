@@ -1,8 +1,13 @@
 # CareElderly
 
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](./LICENSE)
+
 An iOS app for real-time elderly vital sign monitoring and anomaly detection. Receives heart rate, breathing rate, and body temperature over MQTT, runs a CoreML-integrated LSTM Autoencoder for anomaly scoring, and delivers multi-level guardian alerts (push notification, haptic feedback, full-screen popup).
 
 Built as a graduation project at Xidian University, Class of 2026.
+
+<!-- TODO: replace app icon with 30 s demo GIF showing the full alert pipeline -->
+<!-- See docs/gif-shot-list.md for shot sequence and recording instructions -->
 
 ---
 
@@ -10,7 +15,7 @@ Built as a graduation project at Xidian University, Class of 2026.
 
 ```
 MQTT Broker  →  MQTTService  →  VitalSignViewModel  ─┬─▶  DashboardView (live chart)
-                                                      ├─▶  HealthAnalyticsService (LSTM + HRV)
+                                                      ├─▶  HealthAnalyticsService (LSTM + HR variability proxy)
                                                       └─▶  AppState.triggerGuardianAlert()
                                                                   │
                                                      push notification + haptic + popup
@@ -26,7 +31,7 @@ MQTT Broker  →  MQTTService  →  VitalSignViewModel  ─┬─▶  DashboardV
 - **Real-time monitoring** — HR, BR, body temperature via MQTT 3.1.1; 30-sample rolling chart (Swift Charts)
 - **Dual-role system** — Guardian (full alert UI) and Monitored (read-only dashboard)
 - **Guardian alerts** — full-screen popup, Critical Alert push notification, haptic vibration, looping alarm sound; repeats every 30 s until acknowledged
-- **History & analytics** — Core Data persistence, date-range filtering, daily trend chart, HRV analysis (RMSSD / SDNN per ESC/NASPE 1996)
+- **History & analytics** — Core Data persistence, date-range filtering, daily trend chart, HR variability proxy analysis (RMSSD / SDNN)
 - **Threshold configuration** — per-user Warning / Critical thresholds for HR and BR
 - **Self-built MQTT client** — MQTT 3.1.1 from scratch on Network.framework; exponential backoff reconnection (3 s base, 60 s max, 20 attempts), QoS 0/1, TLS support
 
@@ -50,6 +55,24 @@ Input  [1, 30, 2]  (30 samples × [HR, BR], normalised to [0,1])
 Anomaly score = min(MSE / 0.003995, 1.0)   # 95th-percentile threshold on test set
 ```
 
+|  |  |
+|---|---|
+| Parameters | 100,994 |
+| Compiled size (Core ML) | 420 KB |
+| Input shape | [1, 30, 2] |
+
+### On-Device Inference
+
+The model runs locally on iPhone via Core ML; no data leaves the device. Latency and compute-unit placement have not yet been measured.
+
+| Metric | Value |
+|--------|-------|
+| Inference latency | _[to be measured on device]_ |
+| Peak memory during inference | _[to be measured on device]_ |
+| Model load time | _[to be measured on device]_ |
+
+> The compiled `.mlpackage` is 420 KB. All inference runs locally — no data leaves the device.
+
 ### Training Results
 
 | Metric | Value |
@@ -60,7 +83,7 @@ Anomaly score = min(MSE / 0.003995, 1.0)   # 95th-percentile threshold on test s
 | Final val loss (MSE) | 0.001333 |
 | 95th-percentile threshold | 0.003995 |
 
-> **Note on metrics:** The near-perfect ROC AUC reflects the model's ability to separate normal windows from *synthetically generated* anomalies (spike injection, Gaussian noise, sudden step shifts). Real-world clinical anomalies are more subtle and varied; evaluation against a labelled clinical dataset is listed as future work.
+> **Note on metrics:** The near-perfect ROC AUC reflects the model's ability to separate normal windows from *synthetically generated* anomalies (spike injection, Gaussian noise, sudden step shifts). Real-world clinical anomalies are more subtle and varied.
 
 ![Training results](LSTM_AutoDetector/plots/training_results.png)
 
@@ -77,24 +100,31 @@ LSTM_AutoDetector/LSTM_AutoEncoder/bidmc-ppg-and-respiration-dataset-1.0.0/
 
 ```bash
 cd LSTM_AutoDetector/LSTM_AutoEncoder
-pip install torch numpy pandas scikit-learn matplotlib coremltools
 
-# 1. Preprocess dataset → data.npy
+# Install pinned dependencies
+pip install -r ../requirements.txt
+
+# 1. Preprocess dataset → data.npy (requires BIDMC dataset downloaded first)
 python preprocess.py
 
 # 2. Train model (saves vital_autoencoder.pth, plots/, threshold_test.json)
-python train.py
+python train.py                # full 300-epoch training
+python train.py --sample        # quick verification: 5 epochs on a subset
 
 # 3. Export to Core ML
 python export.py
 # → VitalAnomalyDetector.mlpackage  (copy into the Xcode project)
 ```
 
+The `--sample` flag runs 5 epochs on a 200-window subset for a quick sanity check without the full BIDMC dataset.
+
 ---
 
 ## iOS Setup
 
 **Requirements:** Xcode 26+, iOS 26.0+ deployment target
+
+> The Xcode project targets iOS 26.0. The Core ML model is exported with `minimum_deployment_target = iOS 16`.
 
 ```bash
 open CareElderly/CareElderly.xcodeproj
@@ -135,28 +165,25 @@ Valid `event_type` values: `heart_stop`, `breath_stop`, `fall`, `heart_rate_high
 │       ├── ViewModels/             AppState, VitalSignViewModel, AuthViewModel, HistoryViewModel
 │       ├── Views/                  Auth, Main, Analytics, Components
 │       └── VitalAnomalyDetector.mlpackage
-└── LSTM_AutoDetector/
-    ├── LSTM_AutoEncoder/
-    │   ├── preprocess.py           Dataset preprocessing
-    │   ├── train.py                Model definition + training loop
-    │   └── export.py               CoreML export via coremltools
-    ├── plots/                      Training curves and metric charts
-    └── threshold_test.json         95th-percentile MSE threshold
+├── LSTM_AutoDetector/
+│   ├── LSTM_AutoEncoder/
+│   │   ├── preprocess.py           Dataset preprocessing
+│   │   ├── train.py                Model definition + training loop
+│   │   └── export.py               CoreML export via coremltools
+│   ├── requirements.txt            Pinned Python dependencies
+│   ├── plots/                      Training curves and metric charts
+│   └── threshold_test.json         95th-percentile MSE threshold
+└── LICENSE                         MIT
 ```
 
 ---
 
 ## Future Work
 
-- **Real clinical dataset:** The current model is trained on BIDMC (normal physiological data) and evaluated against synthetic anomalies. Replacing or augmenting with a labelled clinical dataset containing genuine cardiac and respiratory events would substantially improve real-world reliability and yield more meaningful evaluation metrics.
-
-- **Model improvements:** The bidirectional LSTM Autoencoder architecture could be extended with a Transformer-based encoder, attention mechanisms, or a variational autoencoder (VAE) formulation to better capture complex temporal dependencies and produce calibrated anomaly scores.
-
-- **Multi-modal input:** Incorporating additional sensor channels (SpO₂, ECG, accelerometer for fall detection) would enable a more comprehensive anomaly model and reduce reliance on rule-based thresholds for non-cardiac events.
-
-- **Personalised fine-tuning:** On-device continual learning could adapt the model's reconstruction baseline to an individual's long-term vital sign patterns, reducing false positives for users whose resting HR or BR naturally falls outside population norms.
-
-- **Backend integration:** A cloud MQTT broker with persistent message queuing and a web dashboard for caregivers would complete the end-to-end system beyond the current iOS-only prototype.
+- **Evaluation-first approach:** Benchmark on a labelled clinical dataset with proper event-based metrics (range-based recall, event-based F-score) rather than per-window AUC.
+- **Model improvements:** Transformer/attention-based encoders, VAE formulation for calibrated anomaly likelihood.
+- **Multi-modal fusion:** Incorporate SpO₂, ECG, or accelerometer data to reduce reliance on rule-based thresholds.
+- **On-device personalisation:** Continual fine-tuning to adapt the reconstruction baseline to individual resting physiology.
 
 ---
 
